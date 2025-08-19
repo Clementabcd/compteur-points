@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Trophy, Users, RotateCcw, Plus, Minus, Edit3, Crown, Medal, Award, Menu, X } from 'lucide-react';
 
 interface HistoryEntry {
@@ -94,9 +94,9 @@ const ScoreTracker = () => {
 
   // Focus sur l'input personnalisé quand il s'ouvre
   useEffect(() => {
-    if (activeCustomPlayer !== null && customInputRef.current) {
+    if (activeCustomPlayer !== null) {
       setTimeout(() => {
-        customInputRef.current.focus();
+        customInputRef.current?.focus();
       }, 100);
     }
   }, [activeCustomPlayer]);
@@ -171,7 +171,7 @@ const ScoreTracker = () => {
   // Trier les joueurs par score pour le classement
   const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
 
-  const getRankIcon = (rank: number): JSX.Element => {
+  const getRankIcon = (rank: number): React.ReactElement => {
     switch (rank) {
       case 1: return <Crown className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" />;
       case 2: return <Medal className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" />;
