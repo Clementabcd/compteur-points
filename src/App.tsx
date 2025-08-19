@@ -1,26 +1,39 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Trophy, Users, RotateCcw, Plus, Minus, Edit3, Crown, Medal, Award, Menu, X } from 'lucide-react';
 
+interface HistoryEntry {
+  points: number;
+  timestamp: string;
+  type: 'add' | 'subtract';
+}
+
+interface Player {
+  id: number;
+  name: string;
+  score: number;
+  history: HistoryEntry[];
+}
+
 const ScoreTracker = () => {
-  const [gameState, setGameState] = useState('setup');
+  const [gameState, setGameState] = useState<'setup' | 'playing'>('setup');
   const [playerCount, setPlayerCount] = useState(2);
-  const [players, setPlayers] = useState([]);
+  const [players, setPlayers] = useState<Player[]>([]);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [customScore, setCustomScore] = useState('');
-  const [activeCustomPlayer, setActiveCustomPlayer] = useState(null);
+  const [activeCustomPlayer, setActiveCustomPlayer] = useState<number | null>(null);
   const [showMenu, setShowMenu] = useState(false);
   
-  const customInputRef = useRef(null);
+  const customInputRef = useRef<HTMLInputElement>(null);
 
   // Utilitaires pour les cookies
-  const setCookie = (name, value, hours = 2) => {
+  const setCookie = (name: string, value: any, hours: number = 2): void => {
     const date = new Date();
     date.setTime(date.getTime() + (hours * 60 * 60 * 1000));
     const expires = "expires=" + date.toUTCString();
     document.cookie = name + "=" + JSON.stringify(value) + ";" + expires + ";path=/;SameSite=Lax";
   };
 
-  const getCookie = (name) => {
+  const getCookie = (name: string): any => {
     const nameEQ = name + "=";
     const ca = document.cookie.split(';');
     for(let i = 0; i < ca.length; i++) {
@@ -37,7 +50,7 @@ const ScoreTracker = () => {
     return null;
   };
 
-  const deleteCookie = (name) => {
+  const deleteCookie = (name: string): void => {
     document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   };
 
@@ -88,7 +101,7 @@ const ScoreTracker = () => {
     }
   }, [activeCustomPlayer]);
 
-  const updatePlayerName = (playerId, newName) => {
+  const updatePlayerName = (playerId: number, newName: string): void => {
     setPlayers(prev => prev.map(player =>
       player.id === playerId 
         ? { ...player, name: newName || `Joueur ${playerId}` }
@@ -96,7 +109,7 @@ const ScoreTracker = () => {
     ));
   };
 
-  const addScore = (playerId, points, isSubtraction = false) => {
+  const addScore = (playerId: number, points: number, isSubtraction: boolean = false): void => {
     const actualPoints = isSubtraction ? -Math.abs(points) : Math.abs(points);
     
     setPlayers(prev => prev.map(player =>
@@ -117,7 +130,7 @@ const ScoreTracker = () => {
     ));
   };
 
-  const handleCustomScore = (playerId) => {
+  const handleCustomScore = (playerId: number): void => {
     const points = parseInt(customScore);
     if (!isNaN(points) && points > 0) {
       addScore(playerId, points);
@@ -126,7 +139,7 @@ const ScoreTracker = () => {
     }
   };
 
-  const handleCustomSubtract = (playerId) => {
+  const handleCustomSubtract = (playerId: number): void => {
     const points = parseInt(customScore);
     if (!isNaN(points) && points > 0) {
       addScore(playerId, points, true);
@@ -135,7 +148,7 @@ const ScoreTracker = () => {
     }
   };
 
-  const resetGame = () => {
+  const resetGame = (): void => {
     setPlayers(prev => prev.map(player => ({
       ...player,
       score: 0,
@@ -158,7 +171,7 @@ const ScoreTracker = () => {
   // Trier les joueurs par score pour le classement
   const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
 
-  const getRankIcon = (rank) => {
+  const getRankIcon = (rank: number): JSX.Element => {
     switch (rank) {
       case 1: return <Crown className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" />;
       case 2: return <Medal className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" />;
@@ -167,7 +180,7 @@ const ScoreTracker = () => {
     }
   };
 
-  const getRankColor = (rank) => {
+  const getRankColor = (rank: number): string => {
     switch (rank) {
       case 1: return 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-white';
       case 2: return 'bg-gradient-to-r from-gray-300 to-gray-500 text-white';
